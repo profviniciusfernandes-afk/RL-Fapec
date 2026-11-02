@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado Raciocínio Lógico - FAPEC (TAE UFMS)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js para gráficos de desempenho -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2pdf.js para Exportação em PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header Corporativo -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap justify-between items-center gap-3">
+            <!-- Logo & Informações do Concurso -->
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600/90 text-white p-2.5 rounded-xl shadow-inner border border-indigo-400/30">
+                    <i class="fa-solid fa-brain text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-base font-bold tracking-tight text-slate-100">Simulado Raciocínio Lógico</h1>
+                        <span class="hidden sm:inline-block bg-indigo-500/20 text-indigo-300 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border border-indigo-500/30">FAPEC</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Preparatório Concurso TAE • UFMS</p>
+                </div>
+            </div>
+
+            <!-- Stats & Restart Header Bar -->
+            <div id="header-right" class="hidden flex items-center gap-3">
+                <div class="flex items-center gap-3 bg-slate-800/80 border border-slate-700/80 px-3.5 py-1.5 rounded-lg text-xs font-medium">
+                    <span id="user-display-tag" class="text-indigo-300 font-semibold hidden md:inline"><i class="fa-solid fa-user-check mr-1"></i><span id="user-name-tag">Candidato</span></span>
+                    <span class="text-slate-600 hidden md:inline">|</span>
+                    <span id="progress-indicator" class="text-slate-300"><i class="fa-solid fa-list-check text-indigo-400 mr-1"></i> <span id="current-q-num">1</span>/10</span>
+                    <span class="text-slate-600">|</span>
+                    <span id="score-live" class="text-slate-300"><i class="fa-solid fa-star text-amber-400 mr-1"></i> <span id="current-score">0</span> pts</span>
+                </div>
+                <!-- Restart Header Button -->
+                <button onclick="confirmRestart()" title="Reiniciar Simulado" class="bg-slate-800 hover:bg-rose-900/60 text-slate-300 hover:text-rose-200 border border-slate-700 hover:border-rose-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span class="hidden sm:inline">Reiniciar</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-4 py-8 w-full flex-grow flex items-center justify-center">
+
+        <!-- SCREEN 1: START SCREEN -->
+        <div id="start-screen" class="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-slate-200/80 w-full">
+            <div class="text-center max-w-xl mx-auto">
+                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100 flex items-center justify-center mx-auto mb-4 text-2xl shadow-sm">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Simulado Raciocínio Lógico</h2>
+                <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-6">
+                    Mapeie seus déficits específicos e treine no perfil da banca <strong class="text-slate-800">FAPEC</strong> para os cargos de Técnico-Administrativo em Educação da <strong class="text-slate-800">UFMS</strong>.
+                </p>
+
+                <!-- Input Nome do Candidato -->
+                <div class="mb-6 text-left max-w-md mx-auto">
+                    <label for="candidate-name" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">
+                        <i class="fa-solid fa-id-card text-indigo-600 mr-1"></i> Nome do Candidato / Concurseiro:
+                    </label>
+                    <input type="text" id="candidate-name" placeholder="Digite seu nome para o relatório..." class="w-full px-4 py-3 rounded-xl border border-slate-300 text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm shadow-sm" />
+                </div>
+            </div>
+
+            <!-- Dashboard de Metras do Simulado -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left max-w-2xl mx-auto mb-8">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/70 shadow-sm">
+                    <div class="text-indigo-700 font-bold mb-1 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group"></i> 10 Questões
+                    </div>
+                    <p class="text-xs text-slate-500 leading-snug">Selecionadas aleatoriamente de um banco com 80 questões.</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/70 shadow-sm">
+                    <div class="text-amber-700 font-bold mb-1 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-stopwatch"></i> 3 Min / Questão
+                    </div>
+                    <p class="text-xs text-slate-500 leading-snug">Tempo regressivo para simular a pressão real de prova.</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/70 shadow-sm">
+                    <div class="text-emerald-700 font-bold mb-1 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie"></i> Análise de Déficits
+                    </div>
+                    <p class="text-xs text-slate-500 leading-snug">Diagnóstico automático das matérias que exigem revisão.</p>
+                </div>
+            </div>
+
+            <!-- Start Button -->
+            <div class="text-center">
+                <button id="start-btn" onclick="startGame()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-10 rounded-xl shadow-lg hover:shadow-indigo-500/25 transition-all transform active:scale-95 inline-flex items-center gap-2.5 text-base">
+                    <i class="fa-solid fa-play text-sm"></i> Iniciar Simulado
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: GAMEPLAY SCREEN -->
+        <div id="game-screen" class="hidden w-full">
+            <!-- Header do Card: Assunto + Cronômetro -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-4 flex flex-wrap justify-between items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Tópico:</span>
+                    <span id="question-category" class="bg-slate-100 text-slate-800 text-xs font-semibold px-3 py-1 rounded-md border border-slate-200">
+                        Lógica Proposicional
+                    </span>
+                </div>
+
+                <!-- Cronômetro da Questão -->
+                <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3.5 py-1.5 rounded-lg text-xs font-semibold">
+                    <span class="text-slate-500 uppercase tracking-wider text-[11px]"><i class="fa-solid fa-clock text-amber-500 mr-1"></i>Tempo:</span>
+                    <span id="timer-display" class="text-slate-800 font-mono font-bold text-sm">03:00</span>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button onclick="startGame()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition shadow-md flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-rotate-right"></i> Jogar Nova Rodada (10 novas questões)
+                    </button>
+                    <button onclick="exportToPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-xl transition shadow-md flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-file-pdf"></i> Exportar Resultados em PDF
+                    </button>
+                    <button onclick="resetToInitialState()" class="bg-slate-700 hover:bg-slate-800 text-white font-semibold py-3 px-6 rounded-xl transition shadow-md flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-house-user"></i> Voltar ao Início Total
+                    </button>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 mb-4">
+                <!-- Enunciado da Questão -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[11px] font-bold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded border border-indigo-100">Banca FAPEC • Múltipla Escolha</span>
+                    </div>
+                    <p id="question-text" class="text-slate-900 text-base sm:text-lg font-semibold leading-relaxed">
+                        Carregando questão...
+                    </p>
+                </div>
+
+                <!-- Alternativas -->
+                <div id="options-container" class="space-y-3">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+
+            <!-- Feedback & Next Action Footer -->
+            <div id="feedback-panel" class="hidden bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                <div id="feedback-message" class="flex items-center gap-3">
+                    <!-- Filled by JS -->
+                </div>
+                <button id="next-btn" onclick="nextQuestion()" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg transition flex items-center justify-center gap-2 shadow-sm text-sm">
+                    Próxima Questão <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: RESULTS & DIAGNOSTIC -->
+        <div id="results-screen" class="hidden w-full space-y-6">
+            <!-- Card Resumo do Desempenho -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-indigo-50 text-indigo-700 rounded-full mb-3 border border-indigo-100">
+                    <i class="fa-solid fa-square-poll-vertical text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-extrabold text-slate-900 mb-1">Relatório de Desempenho</h2>
+                <p class="text-sm text-slate-500 mb-6">
+                    Candidato(a): <strong id="res-candidate-name" class="text-slate-800">Candidato</strong> • Simulado TAE UFMS (10 Questões)
+                </p>
+
+                <!-- Grid de Métricas -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+                        <span class="text-xs text-slate-500 block font-medium mb-1">Pontuação Final</span>
+                        <span id="final-score" class="text-3xl font-extrabold text-indigo-700">0/10</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+                        <span class="text-xs text-slate-500 block font-medium mb-1">Aproveitamento</span>
+                        <span id="final-percent" class="text-3xl font-extrabold text-slate-900">0%</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+                        <span class="text-xs text-slate-500 block font-medium mb-1">Acertos</span>
+                        <span id="final-correct" class="text-3xl font-extrabold text-emerald-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+                        <span class="text-xs text-slate-500 block font-medium mb-1">Erros / Tempo</span>
+                        <span id="final-wrong" class="text-3xl font-extrabold text-rose-600">0</span>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button onclick="startGame()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-xl transition shadow-md flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-rotate-right"></i> Reiniciar Novo Simulado (10 novas questões)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Diagnóstico de Déficits -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="bg-amber-100 text-amber-800 p-2.5 rounded-xl border border-amber-200">
+                        <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">Mapeamento de Déficits por Assunto</h3>
+                        <p class="text-xs text-slate-500">Diagnóstico analítico para direcionar sua revisão teórica</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-4">
+                    <!-- Chart -->
+                    <div class="w-full max-w-xs mx-auto">
+                        <canvas id="topicsChart"></canvas>
+                    </div>
+
+                    <!-- Lista de Déficits -->
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
+                            <i class="fa-solid fa-list-ul"></i> Status de Aproveitamento por Tópico:
+                        </h4>
+                        <div id="deficits-list" class="space-y-2.5 custom-scrollbar max-h-64 overflow-y-auto pr-1">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gabarito Comentado -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-indigo-600"></i> Gabarito Comentado da Rodada
+                </h3>
+                <div id="review-list" class="space-y-4">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal de Confirmação para Reiniciar -->
+    <div id="restart-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 text-center">
+            <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-rotate-right"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Reiniciar Simulado?</h3>
+            <p class="text-slate-600 text-sm mb-6">Seu progresso atual na rodada será descartado e 10 novas questões serão sorteadas.</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeRestartModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition">
+                    Cancelar
+                </button>
+                <button onclick="confirmRestartAction()" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-sm shadow-md transition">
+                    Sim, Reiniciar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Corporativo com Créditos Solicitados -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-xs text-slate-400">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <p>Simulado Preparatório FAPEC • Concurso TAE UFMS</p>
+            <p class="font-medium text-slate-300">
+                Desenvolvido por <span class="text-indigo-400 font-semibold">Vinícius Augusto & Gemini IA</span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (80 QUESTÕES BANCA FAPEC TAE UFMS) ---
+        const questionBank = [
+            // 1. Lógica Proposicional & Negações (10)
+            {
+                id: 1,
+                topic: "Lógica Proposicional",
+                question: "Considere a proposição 'Se o servidor público cumpre suas metas, então ganha gratificação'. Assinale a alternativa que apresenta a negação lógica correta dessa sentença.",
+                options: [
+                    "Se o servidor público não cumpre suas metas, então não ganha gratificação.",
+                    "O servidor público cumpre suas metas e não ganha gratificação.",
+                    "O servidor público não cumpre suas metas e ganha gratificação.",
+                    "Se o servidor ganha gratificação, então cumpre suas metas.",
+                    "O servidor público cumpre suas metas ou não ganha gratificação."
+                ],
+                correct: 1,
+                explanation: "A negação da condicional (p → q) é dada pela regra 'Mantém a 1ª E Nega a 2ª' (p ∧ ~q). Portanto: 'O servidor cumpre suas metas E NÃO ganha gratificação'."
+            },
+            {
+                id: 2,
+                topic: "Lógica Proposicional",
+                question: "A negação da proposição 'Marcos é analista ou Patricia é técnica' é representada por:",
+                options: [
+                    "Marcos não é analista e Patricia não é técnica.",
+                    "Marcos não é analista ou Patricia não é técnica.",
+                    "Se Marcos é analista, então Patricia é técnica.",
+                    "Marcos é analista e Patricia não é técnica.",
+                    "Marcos não é analista se e somente se Patricia for técnica."
+                ],
+                correct: 0,
+                explanation: "Pela Lei de De Morgan, ~(p ∨ q) ≡ ~p ∧ ~q. Nega-se ambas as proposições e substitui-se o conectivo 'ou' por 'e'."
+            },
+            {
+                id: 3,
+                topic: "Lógica Proposicional",
+                question: "Dada a proposição composta: 'Se o edital for publicado, haverá prova no domingo'. Sua equivalência lógica é:",
+                options: [
+                    "Se não houver prova no domingo, o edital não foi publicado.",
+                    "Se houver prova no domingo, o edital foi publicado.",
+                    "O edital foi publicado e haverá prova no domingo.",
+                    "Não haverá prova no domingo ou o edital foi publicado.",
+                    "O edital não foi publicado e não haverá prova no domingo."
+                ],
+                correct: 0,
+                explanation: "A equivalência da condicional (p → q) pode ser dada pela contrapositiva (~q → ~p): 'Se não houver prova no domingo, então o edital não foi publicado'."
+            },
+            {
+                id: 4,
+                topic: "Lógica Proposicional",
+                question: "Qual das proposições a seguir é equivalente a 'O documento foi assinado ou o processo foi arquivado'?",
+                options: [
+                    "Se o documento não foi assinado, então o processo foi arquivado.",
+                    "Se o documento foi assinado, então o processo foi arquivado.",
+                    "O documento foi assinado e o processo foi arquivado.",
+                    "Se o processo foi arquivado, o documento foi assinado.",
+                    "O documento não foi assinado e o processo não foi arquivado."
+                ],
+                correct: 0,
+                explanation: "Regra da equivalência entre disjunção e condicional (NEOU): (p ∨ q) ≡ (~p → q)."
+            },
+            {
+                id: 5,
+                topic: "Lógica Proposicional",
+                question: "Considere verdadeira a proposição: 'Todo técnico de TI da UFMS domina redes'. Sabendo disso, é correto afirmar que:",
+                options: [
+                    "Se Carlos domina redes, então ele é técnico de TI da UFMS.",
+                    "Se Lucas não domina redes, então ele não é técnico de TI da UFMS.",
+                    "Se Bruno não é técnico de TI da UFMS, então ele não domina redes.",
+                    "Existem técnicos de TI da UFMS que não dominam redes.",
+                    "Ninguém domina redes além dos técnicos de TI da UFMS."
+                ],
+                correct: 1,
+                explanation: "'Todo A é B' implica que quem NÃO é B obrigatoriamente NÃO é A."
+            },
+            {
+                id: 6,
+                topic: "Lógica Proposicional",
+                question: "A contradição é uma proposição cujo valor lógico é sempre falso. Assinale o exemplo de contradição:",
+                options: [
+                    "O sol brilha e a lua ilumina.",
+                    "O edital saiu ou o edital não saiu.",
+                    "O candidato foi aprovado e o candidato não foi aprovado.",
+                    "Se chover, a rua fica molhada.",
+                    "Se o candidato estuda, ele passa."
+                ],
+                correct: 2,
+                explanation: "A conjunção simultânea de uma afirmação com a sua negação (p ∧ ~p) é sempre Falsa."
+            },
+            {
+                id: 7,
+                topic: "Lógica Proposicional",
+                question: "Uma Tautologia é uma proposição lógica que é sempre verdadeira. Qual das opções é uma tautologia?",
+                options: [
+                    "p ∧ ~p",
+                    "p → ~p",
+                    "p ∨ ~p",
+                    "p ↔ ~p",
+                    "~p ∧ p"
+                ],
+                correct: 2,
+                explanation: "A disjunção (p ∨ ~p) do Princípio do Terceiro Excluído é sempre verdadeira."
+            },
+            {
+                id: 8,
+                topic: "Lógica Proposicional",
+                question: "Negação de: 'Todos os alunos da UFMS foram aprovados no exame'.",
+                options: [
+                    "Nenhum aluno da UFMS foi aprovado no exame.",
+                    "Pelo menos um aluno da UFMS não foi aprovado no exame.",
+                    "Todos os alunos da UFMS foram reprovados.",
+                    "Nenhum aluno da UFMS realizou o exame.",
+                    "A maioria dos alunos foi reprovada."
+                ],
+                correct: 1,
+                explanation: "A negação do quantificador universal 'Todo A é B' é 'Pelo menos um A não é B'."
+            },
+            {
+                id: 9,
+                topic: "Lógica Proposicional",
+                question: "A negação da proposição 'Nenhum funcionário faltou à reunião' é:",
+                options: [
+                    "Todos os funcionários faltaram à reunião.",
+                    "Ao menos um funcionário faltou à reunião.",
+                    "Nenhum funcionário compareceu à reunião.",
+                    "Alguns funcionários não faltaram à reunião.",
+                    "A reunião foi cancelada."
+                ],
+                correct: 1,
+                explanation: "A negação de 'Nenhum A é B' é 'Pelo menos um / Algum A é B'."
+            },
+            {
+                id: 10,
+                topic: "Lógica Proposicional",
+                question: "Se p é Verdadeiro e q é Falso, o valor lógico de (p ∧ ~q) → q é:",
+                options: [
+                    "Verdadeiro",
+                    "Falso",
+                    "Inconclusivo",
+                    "Tautológico",
+                    "Nulo"
+                ],
+                correct: 1,
+                explanation: "p=V, q=F. ~q=V. (V ∧ V) = V. Na condicional, V → F resulta em FALSO."
+            },
+
+            // 2. Análise Combinatória (10)
+            {
+                id: 11,
+                topic: "Análise Combinatória",
+                question: "De quantas maneiras distintas um comitê de 3 servidores pode ser formado a partir de um grupo de 7 servidores disponíveis na UFMS?",
+                options: [
+                    "21",
+                    "35",
+                    "42",
+                    "210",
+                    "105"
+                ],
+                correct: 1,
+                explanation: "Combinação simples C(7,3) = (7 × 6 × 5) / (3 × 2 × 1) = 35."
+            },
+            {
+                id: 12,
+                topic: "Análise Combinatória",
+                question: "Quantos anagramas possui a palavra 'FAPEC'?",
+                options: [
+                    "20",
+                    "60",
+                    "120",
+                    "24",
+                    "720"
+                ],
+                correct: 2,
+                explanation: "Palavra de 5 letras distintas: P(5) = 5! = 120."
+            },
+            {
+                id: 13,
+                topic: "Análise Combinatória",
+                question: "Uma senha de acesso deve ser formada por 2 letras distintas seguidas de 2 algarismos distintos. Usando 26 letras e 10 algarismos, quantas senhas podem ser criadas?",
+                options: [
+                    "65.000",
+                    "58.500",
+                    "67.600",
+                    "52.000",
+                    "45.000"
+                ],
+                correct: 1,
+                explanation: "Letras: 26 × 25 = 650. Algarismos: 10 × 9 = 90. Total = 650 × 90 = 58.500."
+            },
+            {
+                id: 14,
+                topic: "Análise Combinatória",
+                question: "Quantos anagramas da palavra 'UFMS' começam por vogal?",
+                options: [
+                    "6",
+                    "12",
+                    "18",
+                    "24",
+                    "4"
+                ],
+                correct: 0,
+                explanation: "Vogal 'U' na 1ª posição (1). As outras 3 letras permutadas (3! = 6). Total: 1 × 6 = 6."
+            },
+            {
+                id: 15,
+                topic: "Análise Combinatória",
+                question: "Em uma reunião com 5 diretores, todos se cumprimentam com um aperto de mão uma única vez. Quantos apertos de mão ocorreram?",
+                options: [
+                    "10",
+                    "20",
+                    "25",
+                    "15",
+                    "5"
+                ],
+                correct: 0,
+                explanation: "C(5,2) = (5 × 4) / 2 = 10."
+            },
+            {
+                id: 16,
+                topic: "Análise Combinatória",
+                question: "Quantos triângulos distintos podem ser formados escolhendo-se 3 vértices de um octógono regular?",
+                options: [
+                    "56",
+                    "336",
+                    "24",
+                    "112",
+                    "48"
+                ],
+                correct: 0,
+                explanation: "C(8,3) = (8 × 7 × 6) / 6 = 56."
+            },
+            {
+                id: 17,
+                topic: "Análise Combinatória",
+                question: "De quantas formas 4 pessoas podem se sentar em 4 cadeiras em fileira?",
+                options: [
+                    "16",
+                    "12",
+                    "24",
+                    "8",
+                    "64"
+                ],
+                correct: 2,
+                explanation: "Permutação simples P(4) = 4! = 24."
+            },
+            {
+                id: 18,
+                topic: "Análise Combinatória",
+                question: "Quantos números pares de 3 algarismos distintos podem ser formados utilizando apenas os algarismos 1, 2, 3, 4 e 5?",
+                options: [
+                    "24",
+                    "48",
+                    "60",
+                    "12",
+                    "36"
+                ],
+                correct: 0,
+                explanation: "Último dígito (2 ou 4) -> 2 opções. Restam 4 opções para o 1º dígito e 3 para o 2º. Total = 4 × 3 × 2 = 24."
+            },
+            {
+                id: 19,
+                topic: "Análise Combinatória",
+                question: "Com 4 homens e 4 mulheres, quantas comissões de 4 pessoas contêm exatamente 2 homens e 2 mulheres?",
+                options: [
+                    "36",
+                    "16",
+                    "70",
+                    "24",
+                    "48"
+                ],
+                correct: 0,
+                explanation: "C(4,2) × C(4,2) = 6 × 6 = 36."
+            },
+            {
+                id: 20,
+                topic: "Análise Combinatória",
+                question: "Quantos anagramas da palavra 'ARARA' podem ser formados?",
+                options: [
+                    "10",
+                    "120",
+                    "20",
+                    "60",
+                    "5"
+                ],
+                correct: 0,
+                explanation: "Permutação com repetição: 5! / (3! × 2!) = 120 / 12 = 10."
+            },
+
+            // 3. Probabilidade (10)
+            {
+                id: 21,
+                topic: "Probabilidade",
+                question: "Ao lançar um dado justo de 6 faces, qual é a probabilidade de obter um número primo?",
+                options: [
+                    "1/2",
+                    "1/3",
+                    "2/3",
+                    "1/6",
+                    "5/6"
+                ],
+                correct: 0,
+                explanation: "Primos: {2, 3, 5} (3 casos em 6). P = 3/6 = 1/2 (50%)."
+            },
+            {
+                id: 22,
+                topic: "Probabilidade",
+                question: "Em uma urna há 6 bolas brancas e 4 preta. Retirando-se uma bola ao acaso, qual a probabilidade de ser preta?",
+                options: [
+                    "40%",
+                    "60%",
+                    "25%",
+                    "50%",
+                    "30%"
+                ],
+                correct: 0,
+                explanation: "4 pretas em 10 bolas totais: 4/10 = 40%."
+            },
+            {
+                id: 23,
+                topic: "Probabilidade",
+                question: "Lançando dois dados não viciados, qual a probabilidade de a soma dos pontos ser igual a 7?",
+                options: [
+                    "1/6",
+                    "1/12",
+                    "5/36",
+                    "7/36",
+                    "1/36"
+                ],
+                correct: 0,
+                explanation: "Pares favoráveis: (1,6),(2,5),(3,4),(4,3),(5,2),(6,1) -> 6 em 36. P = 6/36 = 1/6."
+            },
+            {
+                id: 24,
+                topic: "Probabilidade",
+                question: "Lançando 3 moedas honestas simultaneamente, qual a probabilidade de obter exatamente 2 caras?",
+                options: [
+                    "3/8",
+                    "1/4",
+                    "1/2",
+                    "5/8",
+                    "1/8"
+                ],
+                correct: 0,
+                explanation: "Total 2³=8. Casos com 2 caras = 3. P = 3/8."
+            },
+            {
+                id: 25,
+                topic: "Probabilidade",
+                question: "Uma caixa contém 5 lâmpadas boas e 3 queimadas. Retirando-se duas sem reposição, qual a probabilidade de ambas serem boas?",
+                options: [
+                    "5/14",
+                    "25/64",
+                    "15/56",
+                    "5/28",
+                    "10/28"
+                ],
+                correct: 0,
+                explanation: "(5/8) × (4/7) = 20/56 = 5/14."
+            },
+            {
+                id: 26,
+                topic: "Probabilidade",
+                question: "Escolhendo ao acaso um número inteiro de 1 a 20, qual a probabilidade de ser múltiplo de 3?",
+                options: [
+                    "3/10",
+                    "6/20",
+                    "3/20",
+                    "7/20",
+                    "1/3"
+                ],
+                correct: 0,
+                explanation: "Múltiplos: 3, 6, 9, 12, 15, 18 (6 casos). P = 6/20 = 3/10."
+            },
+            {
+                id: 27,
+                topic: "Probabilidade",
+                question: "Em 100 servidores, 60 falam inglês, 40 espanhol e 10 ambos. Qual a probabilidade de um servidor sorteado não falar nenhum dos dois?",
+                options: [
+                    "10%",
+                    "20%",
+                    "30%",
+                    "15%",
+                    "25%"
+                ],
+                correct: 0,
+                explanation: "Falam ao menos um: 60 + 40 - 10 = 90. Nenhum: 10 em 100 = 10%."
+            },
+            {
+                id: 28,
+                topic: "Probabilidade",
+                question: "Se a probabilidade de aprovação de um candidato é 0,35, a probabilidade de ele NÃO ser aprovado é:",
+                options: [
+                    "0,65",
+                    "0,35",
+                    "0,75",
+                    "0,50",
+                    "0,55"
+                ],
+                correct: 0,
+                explanation: "1 - 0,35 = 0,65 (65%)."
+            },
+            {
+                id: 29,
+                topic: "Probabilidade",
+                question: "Retirando uma carta de um baralho de 52 cartas, qual a probabilidade de ser um Ás ou uma carta de Copas?",
+                options: [
+                    "16/52",
+                    "17/52",
+                    "13/52",
+                    "4/52",
+                    "15/52"
+                ],
+                correct: 0,
+                explanation: "(4 Áses + 13 Copas - 1 Ás de Copas) / 52 = 16/52."
+            },
+            {
+                id: 30,
+                topic: "Probabilidade",
+                question: "Um casal planeja ter 2 filhos. Qual a probabilidade de ambos serem do sexo feminino?",
+                options: [
+                    "25%",
+                    "50%",
+                    "75%",
+                    "33.3%",
+                    "20%"
+                ],
+                correct: 0,
+                explanation: "1/2 × 1/2 = 1/4 = 25%."
+            },
+
+            // 4. Sequências Lógicas e Padrões (10)
+            {
+                id: 31,
+                topic: "Sequências Lógicas",
+                question: "Observe a sequência numérica: 2, 5, 10, 17, 26, ... Qual é o próximo termo?",
+                options: [
+                    "37",
+                    "35",
+                    "36",
+                    "40",
+                    "38"
+                ],
+                correct: 0,
+                explanation: "Aumentos de +3, +5, +7, +9... Próximo aumento +11. 26 + 11 = 37."
+            },
+            {
+                id: 32,
+                topic: "Sequências Lógicas",
+                question: "Qual número completa a sequência: 3, 6, 12, 24, 48, ...?",
+                options: [
+                    "96",
+                    "72",
+                    "84",
+                    "60",
+                    "108"
+                ],
+                correct: 0,
+                explanation: "Multiplicação por 2: 48 × 2 = 96."
+            },
+            {
+                id: 33,
+                topic: "Sequências Lógicas",
+                question: "Na sequência de letras A, C, F, J, O, ..., qual é a próxima letra do alfabeto?",
+                options: [
+                    "U",
+                    "T",
+                    "V",
+                    "S",
+                    "Z"
+                ],
+                correct: 0,
+                explanation: "Saltos de +2, +3, +4, +5, +6. A 21ª letra é U."
+            },
+            {
+                id: 34,
+                topic: "Sequências Lógicas",
+                question: "Na sequência de Fibonacci 1, 1, 2, 3, 5, 8, 13, ..., o 9º termo é:",
+                options: [
+                    "34",
+                    "21",
+                    "55",
+                    "26",
+                    "31"
+                ],
+                correct: 0,
+                explanation: "8º termo: 8 + 13 = 21. 9º termo: 13 + 21 = 34."
+            },
+            {
+                id: 35,
+                topic: "Sequências Lógicas",
+                question: "Assinale o próximo número da sequência: 81, 27, 9, 3, ...",
+                options: [
+                    "1",
+                    "0",
+                    "1/3",
+                    "2",
+                    "-3"
+                ],
+                correct: 0,
+                explanation: "Divisão por 3: 3 ÷ 3 = 1."
+            },
+            {
+                id: 36,
+                topic: "Sequências Lógicas",
+                question: "Considere a sequência: 1, 4, 9, 16, 25, 36, ... O 10º termo é:",
+                options: [
+                    "100",
+                    "81",
+                    "64",
+                    "121",
+                    "90"
+                ],
+                correct: 0,
+                explanation: "Quadrados perfeitos: 10² = 100."
+            },
+            {
+                id: 37,
+                topic: "Sequências Lógicas",
+                question: "Identifique o termo intruso na sequência: 2, 4, 8, 14, 32, 64.",
+                options: [
+                    "14",
+                    "8",
+                    "32",
+                    "4",
+                    "64"
+                ],
+                correct: 0,
+                explanation: "Potências de 2. O valor correto no lugar de 14 deveria ser 16."
+            },
+            {
+                id: 38,
+                topic: "Sequências Lógicas",
+                question: "Qual o próximo número da sequência: 100, 95, 85, 70, 50, ...?",
+                options: [
+                    "25",
+                    "30",
+                    "35",
+                    "20",
+                    "15"
+                ],
+                correct: 0,
+                explanation: "Subtrações crescentes: -5, -10, -15, -20, -25. 50 - 25 = 25."
+            },
+            {
+                id: 39,
+                topic: "Sequências Lógicas",
+                question: "Na sequência 2, 20, 4, 18, 6, 16, 8, ..., o próximo termo é:",
+                options: [
+                    "14",
+                    "10",
+                    "12",
+                    "18",
+                    "20"
+                ],
+                correct: 0,
+                explanation: "Sequência alternada decrecente de 2 em 2: 20, 18, 16 -> 14."
+            },
+            {
+                id: 40,
+                topic: "Sequências Lógicas",
+                question: "Determine o valor de X em: 1, 3, 7, 15, 31, X.",
+                options: [
+                    "63",
+                    "62",
+                    "58",
+                    "64",
+                    "55"
+                ],
+                correct: 0,
+                explanation: "Dobro + 1: 31 × 2 + 1 = 63."
+            },
+
+            // 5. Diagramas Lógicos e Conjuntos (10)
+            {
+                id: 41,
+                topic: "Diagramas Lógicos",
+                question: "Em uma pesquisa com 200 alunos, 120 estudam Francês, 100 Alemão e 40 estudam ambos. Quantos não estudam nenhuma?",
+                options: [
+                    "20",
+                    "40",
+                    "30",
+                    "10",
+                    "50"
+                ],
+                correct: 0,
+                explanation: "Ao menos uma: 80 + 60 + 40 = 180. Nenhuma: 200 - 180 = 20."
+            },
+            {
+                id: 42,
+                topic: "Diagramas Lógicos",
+                question: "Se 'Todo Advogado é Bacharel' e 'Algum Bacharel é Professor', conclui-se obrigatoriamente que:",
+                options: [
+                    "Nenhuma das opções anteriores é necessariamente verdadeira.",
+                    "Todo Advogado é Professor.",
+                    "Algum Advogado é Professor.",
+                    "Todo Professor é Advogado.",
+                    "Nenhum Advogado é Professor."
+                ],
+                correct: 0,
+                explanation: "Não há relação direta garantida entre Advogados e Professores."
+            },
+            {
+                id: 43,
+                topic: "Diagramas Lógicos",
+                question: "Sabendo que 'Todo A é B' e 'Nenhum B é C', é correto afirmar:",
+                options: [
+                    "Nenhum A é C.",
+                    "Todo A é C.",
+                    "Algum A é C.",
+                    "Todo C é A.",
+                    "Algum B é C."
+                ],
+                correct: 0,
+                explanation: "Como todo A está em B, e B não se cruza com C, A também não possui intersecção com C."
+            },
+            {
+                id: 44,
+                topic: "Diagramas Lógicos",
+                question: "Dadas as premissas: 'Alguns servidores são poetas' e 'Todos os poetas são sonhadores'. Logo:",
+                options: [
+                    "Alguns servidores são sonhadores.",
+                    "Todos os servidores são sonhadores.",
+                    "Nenhum servidor é sonhador.",
+                    "Todos os sonhadores são servidores.",
+                    "Nenhum poeta é servidor."
+                ],
+                correct: 0,
+                explanation: "Os servidores que são poetas estão contidos em sonhadores."
+            },
+            {
+                id: 45,
+                topic: "Diagramas Lógicos",
+                question: "Se A = {1, 2, 3, 4, 5} e B = {4, 5, 6, 7}, a intersecção (A ∩ B) tem quantos elementos?",
+                options: [
+                    "2",
+                    "3",
+                    "4",
+                    "7",
+                    "5"
+                ],
+                correct: 0,
+                explanation: "Elementos comuns: {4, 5} -> 2 elementos."
+            },
+            {
+                id: 46,
+                topic: "Diagramas Lógicos",
+                question: "Se o conjunto A tem 5 elementos e B tem 3 elementos, qual o número MÁXIMO da união (A ∪ B)?",
+                options: [
+                    "8",
+                    "5",
+                    "15",
+                    "3",
+                    "10"
+                ],
+                correct: 0,
+                explanation: "Ocorre quando os conjuntos são disjuntos: 5 + 3 = 8."
+            },
+            {
+                id: 47,
+                topic: "Diagramas Lógicos",
+                question: "Num grupo de 50 pessoas, 30 gostam de futebol, 25 de basquete e 10 de ambos. Quantas não gostam de nenhum?",
+                options: [
+                    "5",
+                    "10",
+                    "15",
+                    "20",
+                    "0"
+                ],
+                correct: 0,
+                explanation: "Gostam de algum: 20 + 15 + 10 = 45. Nenhum: 50 - 45 = 5."
+            },
+            {
+                id: 48,
+                topic: "Diagramas Lógicos",
+                question: "Considere: 'Toda fruta cítrica contém vitamina C'. A firmação logicamente equivalente é:",
+                options: [
+                    "Se um alimento não tem vitamina C, ele não é uma fruta cítrica.",
+                    "Se um alimento tem vitamina C, ele é uma fruta cítrica.",
+                    "Nenhum legume contém vitamina C.",
+                    "Todas as frutas são cítricas.",
+                    "Apenas frutas cítricas contêm vitamina C."
+                ],
+                correct: 0,
+                explanation: "Contrapositiva do quantificador universal."
+            },
+            {
+                id: 49,
+                topic: "Diagramas Lógicos",
+                question: "Se o conjunto X possui 4 elementos, quantos subconjuntos possui ao todo?",
+                options: [
+                    "16",
+                    "8",
+                    "12",
+                    "4",
+                    "32"
+                ],
+                correct: 0,
+                explanation: "Fórmula do conjunto das partes: 2⁴ = 16."
+            },
+            {
+                id: 50,
+                topic: "Diagramas Lógicos",
+                question: "Considere: 'Nenhum mamífero é réptil' e 'Todos os jacarés são répteis'. Conclui-se que:",
+                options: [
+                    "Nenhum jacaré é mamífero.",
+                    "Algum jacaré é mamífero.",
+                    "Todos os mamíferos são jacarés.",
+                    "Algum réptil é mamífero.",
+                    "Nenhum réptil é jacaré."
+                ],
+                correct: 0,
+                explanation: "Jacarés estão contidos em Répteis, que por sua vez são disjuntos dos Mamíferos."
+            },
+
+            // 6. Lógica de Argumentação (10)
+            {
+                id: 51,
+                topic: "Lógica de Argumentação",
+                question: "Premissas verdadeiras: 'Se o candidato estuda, ele passa'. 'O candidato não passou'. Logo:",
+                options: [
+                    "O candidato não estudou.",
+                    "O candidato estudou muito.",
+                    "A prova foi cancelada.",
+                    "O candidato vai passar na próxima.",
+                    "O candidato estudou e passou."
+                ],
+                correct: 0,
+                explanation: "Modus Tollens: Se p → q e ~q, conclui-se ~p."
+            },
+            {
+                id: 52,
+                topic: "Lógica de Argumentação",
+                question: "Afirmações verdadeiras: 'Carlos é técnico ou Ana é secretária' e 'Carlos não é técnico'. Conclui-se:",
+                options: [
+                    "Ana é secretária.",
+                    "Ana não é secretária.",
+                    "Carlos e Ana são técnicos.",
+                    "Carlos é secretário.",
+                    "Nada se pode concluir."
+                ],
+                correct: 0,
+                explanation: "Silogismo Disjuntivo: Descartando-se uma opção da disjunção, a outra é necessariamente verdadeira."
+            },
+            {
+                id: 53,
+                topic: "Lógica de Argumentação",
+                question: "Se 'Se faz sol, Maria vai à praia' e 'Maria não foi à praia', deduce-se que:",
+                options: [
+                    "Não fez sol.",
+                    "Fez sol.",
+                    "Maria foi ao cinema.",
+                    "Choveu muito.",
+                    "Maria estava doente."
+                ],
+                correct: 0,
+                explanation: "Modus Tollens."
+            },
+            {
+                id: 54,
+                topic: "Lógica de Argumentação",
+                question: "'Se João é aprovado, sua mãe fica feliz'. 'Se a mãe fica feliz, há festa'. Não houve festa. Conclui-se que:",
+                options: [
+                    "João não foi aprovado.",
+                    "João foi aprovado.",
+                    "A mãe de João ficou feliz.",
+                    "Houve festa fora de casa.",
+                    "João não fez a prova."
+                ],
+                correct: 0,
+                explanation: "Encadeamento condicional negado pela consequência final."
+            },
+            {
+                id: 55,
+                topic: "Lógica de Argumentação",
+                question: "Assinale a opção que possui argumento dedutivo VÁLIDO:",
+                options: [
+                    "Se chove, a rua molha. A rua molhou. Logo, choveu.",
+                    "Se estudo, passo. Não estudei. Logo, não passei.",
+                    "Se estudo, passo. Passei. Logo, estudei.",
+                    "Se chove, a rua molha. Não molhou. Logo, não choveu.",
+                    "Todos os cães voam. Rex é cão. Logo, Rex não voa."
+                ],
+                correct: 3,
+                explanation: "Estrutura válida do Modus Tollens."
+            },
+            {
+                id: 56,
+                topic: "Lógica de Argumentação",
+                question: "Premissa: 'Ou Paulo é contador ou Pedro é auditor'. Sabendo que 'Pedro não é auditor':",
+                options: [
+                    "Paulo é contador.",
+                    "Paulo não é contador.",
+                    "Pedro é contador.",
+                    "Ambos são auditores.",
+                    "Nenhuma das alternativas."
+                ],
+                correct: 0,
+                explanation: "Silogismo disjuntivo."
+            },
+            {
+                id: 57,
+                topic: "Lógica de Argumentação",
+                question: "Se 'Todo A é B' e 'Todo B é C', conclui-se que:",
+                options: [
+                    "Todo A é C.",
+                    "Todo C é A.",
+                    "Nenhum A é C.",
+                    "Algum A não é C.",
+                    "Todo B é A."
+                ],
+                correct: 0,
+                explanation: "Transitividade da inclusão de conjuntos."
+            },
+            {
+                id: 58,
+                topic: "Lógica de Argumentação",
+                question: "'Se o orçamento for aprovado, as reformas começarão'. As reformas começaram. O que se conclui?",
+                options: [
+                    "Nenhuma conclusão necessária sobre o orçamento (falácia do consequente).",
+                    "O orçamento foi aprovado.",
+                    "O orçamento foi rejeitado.",
+                    "As reformas vão parar.",
+                    "O orçamento foi cancelado."
+                ],
+                correct: 0,
+                explanation: "Afirmação do consequente é uma falácia. Outros motivos podem ter iniciado a reforma."
+            },
+            {
+                id: 59,
+                topic: "Lógica de Argumentação",
+                question: "Premissa 1: Todos os motoristas têm CNH. Premissa 2: Roberto não tem CNH. Conclusão:",
+                options: [
+                    "Roberto não é motorista.",
+                    "Roberto é motorista.",
+                    "Roberto dirige sem carteira.",
+                    "Roberto perderá a carteira.",
+                    "Roberto é pedestre."
+                ],
+                correct: 0,
+                explanation: "Aplicação direta do Modus Tollens."
+            },
+            {
+                id: 60,
+                topic: "Lógica de Argumentação",
+                question: "Um argumento dedutivo é considerado VÁLIDO quando:",
+                options: [
+                    "É impossível que suas premissas sejam verdadeiras e a conclusão falsa ao mesmo tempo.",
+                    "Sua conclusão é sempre verdadeira na vida real.",
+                    "Possui premissas falsas.",
+                    "Comprova opiniões pessoais.",
+                    "Não tem conclusão."
+                ],
+                correct: 0,
+                explanation: "Definição técnica de validade dedutiva na Lógica."
+            },
+
+            // 7. Problemas Lógicos & Verdades/Mentiras (10)
+            {
+                id: 61,
+                topic: "Problemas Lógicos",
+                question: "Três suspeitos (A, B e C). Apenas UM mente. A diz: 'B mente'. B diz: 'C mente'. C diz: 'A e B mentem'. Quem mente?",
+                options: [
+                    "B",
+                    "A",
+                    "C",
+                    "Nenhum",
+                    "Todos"
+                ],
+                correct: 0,
+                explanation: "Apenas se B mentir os depoimentos se mantêm consistentes sem contradição simultânea."
+            },
+            {
+                id: 62,
+                topic: "Problemas Lógicos",
+                question: "Fila: Ana antes de Bia. Célia depois de Bia. Dani antes de Ana. Quem é a PRIMEIRA?",
+                options: [
+                    "Dani",
+                    "Ana",
+                    "Bia",
+                    "Célia",
+                    "Indeterminado"
+                ],
+                correct: 0,
+                explanation: "Sequência: Dani -> Ana -> Bia -> Célia."
+            },
+            {
+                id: 63,
+                topic: "Problemas Lógicos",
+                question: "Em mesa redonda: Lucas está em frente a Natan. Mateus está à direita de Lucas. Quem está à esquerda de Lucas?",
+                options: [
+                    "Pedro",
+                    "Mateus",
+                    "Natan",
+                    "Ninguém",
+                    "Faltam dados"
+                ],
+                correct: 0,
+                explanation: "Na mesa de 4 lugares, o assento vago à esquerda é ocupado por Pedro."
+            },
+            {
+                id: 64,
+                topic: "Problemas Lógicos",
+                question: "'Se amanhã não chover, iremos ao parque'. Sabendo que NÃO foram ao parque, o que se conclui?",
+                options: [
+                    "Choveu.",
+                    "Não choveu.",
+                    "Foram ao cinema.",
+                    "O pai adoeceu.",
+                    "Não é possível determinar."
+                ],
+                correct: 0,
+                explanation: "Negação do consequente implica na negação do antecedente (choveu)."
+            },
+            {
+                id: 65,
+                topic: "Problemas Lógicos",
+                question: "João, Pedro e Maria trabalham nos setores A, B e C. João não é do A. Maria é do C. Onde trabalha Pedro?",
+                options: [
+                    "Setor A",
+                    "Setor B",
+                    "Setor C",
+                    "Setor A ou B",
+                    "Setor B ou C"
+                ],
+                correct: 0,
+                explanation: "Maria=C. João=B. Logo, Pedro trabalha no Setor A."
+            },
+            {
+                id: 66,
+                topic: "Problemas Lógicos",
+                question: "Se 5 gatos pegam 5 ratos em 5 minutos, quantos minutos 100 gatos levam para pegar 100 ratos?",
+                options: [
+                    "5 minutos",
+                    "100 minutos",
+                    "50 minutos",
+                    "1 minuto",
+                    "25 minutos"
+                ],
+                correct: 0,
+                explanation: "A taxa individual é 1 gato para 1 rato em 5 minutos."
+            },
+            {
+                id: 67,
+                topic: "Problemas Lógicos",
+                question: "Guto é mais alto que Hélio. Igor é mais baixo que Hélio. Qual a ordem decrescente?",
+                options: [
+                    "Guto, Hélio, Igor",
+                    "Igor, Hélio, Guto",
+                    "Hélio, Guto, Igor",
+                    "Guto, Igor, Hélio",
+                    "Hélio, Igor, Guto"
+                ],
+                correct: 0,
+                explanation: "Guto > Hélio > Igor."
+            },
+            {
+                id: 68,
+                topic: "Problemas Lógicos",
+                question: "Três caixas mal etiquetadas (Maçãs, Laranjas, Mistas). Quantas frutas retirar para identificar todas com certeza?",
+                options: [
+                    "1 fruta da caixa com etiqueta 'Maçãs e Laranjas'",
+                    "2 frutas da caixa 'Maçãs'",
+                    "1 de cada caixa",
+                    "3 frutas da caixa 'Laranjas'",
+                    "Nenhuma"
+                ],
+                correct: 0,
+                explanation: "Retirar 1 fruta da caixa etiquetada incorretamente como 'Mista' revela seu conteúdo real."
+            },
+            {
+                id: 69,
+                topic: "Problemas Lógicos",
+                question: "Se ontem fosse amanhã, hoje seria sexta-feira. Em que dia da semana isso foi dito?",
+                options: [
+                    "Domingo",
+                    "Sábado",
+                    "Quarta-feira",
+                    "Quinta-feira",
+                    "Terça-feira"
+                ],
+                correct: 0,
+                explanation: "Hoje é Domingo (ontem=sábado). Se sábado fosse amanhã, o hoje seria sexta."
+            },
+            {
+                id: 70,
+                topic: "Problemas Lógicos",
+                question: "Maria tem 4 filhas. Cada filha tem 1 irmão. Quantos filhos Maria tem?",
+                options: [
+                    "5",
+                    "8",
+                    "4",
+                    "9",
+                    "6"
+                ],
+                correct: 0,
+                explanation: "4 filhas + 1 filho homem único (que é irmão de todas). Total = 5."
+            },
+
+            // 8. Raciocínio Numérico & Porcentagem (10)
+            {
+                id: 71,
+                topic: "Raciocínio Numérico",
+                question: "Um produto de R$ 200,00 sofreu aumento de 20% e depois desconto de 20%. Qual o valor final?",
+                options: [
+                    "R$ 192,00",
+                    "R$ 200,00",
+                    "R$ 180,00",
+                    "R$ 196,00",
+                    "R$ 204,00"
+                ],
+                correct: 0,
+                explanation: "200 × 1,20 = 240. Depois 240 × 0,80 = R$ 192,00."
+            },
+            {
+                id: 72,
+                topic: "Raciocínio Numérico",
+                question: "Se 4 servidores arquivam 80 processos em 2h, quantos processos 6 servidores arquivarão em 3h?",
+                options: [
+                    "180",
+                    "120",
+                    "160",
+                    "240",
+                    "150"
+                ],
+                correct: 0,
+                explanation: "Regra de 3 composta: (4 × 2)/80 = (6 × 3)/X => 8/80 = 18/X => X = 180."
+            },
+            {
+                id: 73,
+                topic: "Raciocínio Numérico",
+                question: "A média de idade de 4 servidores é 30 anos. Se entrar um quinto servidor de 40 anos, qual será a nova média?",
+                options: [
+                    "32 anos",
+                    "34 anos",
+                    "35 anos",
+                    "31 anos",
+                    "33 anos"
+                ],
+                correct: 0,
+                explanation: "Soma inicial = 120. Nova soma = 160. Nova média = 160 / 5 = 32 anos."
+            },
+            {
+                id: 74,
+                topic: "Raciocínio Numérico",
+                question: "R$ 1.000,00 aplicados a juros simples de 2% ao mês durante 5 meses rende quanto de juros?",
+                options: [
+                    "R$ 100,00",
+                    "R$ 50,00",
+                    "R$ 110,00",
+                    "R$ 10,00",
+                    "R$ 200,00"
+                ],
+                correct: 0,
+                explanation: "J = 1000 × 0,02 × 5 = R$ 100,00."
+            },
+            {
+                id: 75,
+                topic: "Raciocínio Numérico",
+                question: "Um carro percorre um trecho a 60 km/h em 4 horas. Quanto tempo levará a 80 km/h?",
+                options: [
+                    "3 horas",
+                    "2,5 horas",
+                    "3,5 horas",
+                    "5 horas",
+                    "2 horas"
+                ],
+                correct: 0,
+                explanation: "Distância = 240 km. Tempo = 240 / 80 = 3 horas."
+            },
+            {
+                id: 76,
+                topic: "Raciocínio Numérico",
+                question: "Em uma sala com 40 alunos, 60% são mulheres. Quantos homens há na sala?",
+                options: [
+                    "16",
+                    "24",
+                    "14",
+                    "20",
+                    "18"
+                ],
+                correct: 0,
+                explanation: "40% homens = 0,40 × 40 = 16."
+            },
+            {
+                id: 77,
+                topic: "Raciocínio Numérico",
+                question: "3 torneiras enchem um reservatório em 6h. Quantas torneiras encheriam o mesmo reservatório em 2h?",
+                options: [
+                    "9",
+                    "6",
+                    "8",
+                    "12",
+                    "4"
+                ],
+                correct: 0,
+                explanation: "Inversamente proporcional: 3 × 6 = X × 2 => X = 9."
+            },
+            {
+                id: 78,
+                topic: "Raciocínio Numérico",
+                question: "A razão de homens para mulheres num setor é 2/3. Se há 12 homens, qual o total de servidores?",
+                options: [
+                    "30",
+                    "18",
+                    "24",
+                    "20",
+                    "36"
+                ],
+                correct: 0,
+                explanation: "12/M = 2/3 => M = 18. Total = 12 + 18 = 30."
+            },
+            {
+                id: 79,
+                topic: "Raciocínio Numérico",
+                question: "Se x + y = 15 e x - y = 5, qual o valor do produto x · y?",
+                options: [
+                    "50",
+                    "100",
+                    "75",
+                    "25",
+                    "60"
+                ],
+                correct: 0,
+                explanation: "x = 10, y = 5. Produto = 10 × 5 = 50."
+            },
+            {
+                id: 80,
+                topic: "Raciocínio Numérico",
+                question: "Inscrição de concurso subiu de R$ 80,00 para R$ 100,00. Qual foi o percentual de aumento?",
+                options: [
+                    "25%",
+                    "20%",
+                    "30%",
+                    "15%",
+                    "22.5%"
+                ],
+                correct: 0,
+                explanation: "Aumento de R$ 20 sobre 80 = 20/80 = 25%."
+            }
+        ];
+
+        // --- ESTADO DO JOGO ---
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timer = null;
+        let timeLeft = 180; // 3 minutos por questão
+        let userAnswers = [];
+        let candidateName = "Candidato";
+        let chartInstance = null;
+
+        // --- FUNÇÕES DE CONTROLE ---
+
+        function startGame() {
+            // Pegar o nome do candidato
+            const inputName = document.getElementById("candidate-name").value.trim();
+            if (inputName !== "") {
+                candidateName = inputName;
+            }
+
+            // Atualizar Tags com o nome
+            document.getElementById("user-name-tag").innerText = candidateName;
+
+            // Sortear 10 questões do banco de 80
+            const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+            currentQuestions = shuffled.slice(0, 10);
+
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+
+            // UI Transição
+            document.getElementById("start-screen").classList.add("hidden");
+            document.getElementById("results-screen").classList.add("hidden");
+            document.getElementById("game-screen").classList.remove("hidden");
+            document.getElementById("header-right").classList.remove("hidden");
+            document.getElementById("header-right").classList.add("flex");
+
+            updateHeaderStats();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            clearInterval(timer);
+            timeLeft = 180; // 3 minutos
+
+            const q = currentQuestions[currentQuestionIndex];
+            document.getElementById("current-q-num").innerText = currentQuestionIndex + 1;
+            document.getElementById("question-category").innerText = q.topic;
+            document.getElementById("question-text").innerText = q.question;
+
+            // Renderizar Alternativas
+            const optionsContainer = document.getElementById("options-container");
+            optionsContainer.innerHTML = "";
+
+            const labels = ["A", "B", "C", "D", "E"];
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "w-full text-left p-4 rounded-xl border border-slate-200/90 hover:border-indigo-500 hover:bg-indigo-50/40 transition-all flex items-start gap-3.5 group shadow-sm";
+                btn.onclick = () => selectOption(idx);
+                btn.id = `opt-${idx}`;
+                btn.innerHTML = `
+                    <span class="w-7 h-7 flex-shrink-0 bg-slate-100 group-hover:bg-indigo-600 group-hover:text-white text-slate-700 rounded-lg text-xs font-bold flex items-center justify-center transition border border-slate-200">
+                        ${labels[idx]}
+                    </span>
+                    <span class="text-slate-800 text-sm sm:text-base font-medium pt-0.5 leading-snug">${opt}</span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            // Esconder painel de feedback
+            document.getElementById("feedback-panel").classList.add("hidden");
+
+            // Iniciar Cronômetro
+            startTimer();
+        }
+
+        function startTimer() {
+            updateTimerDisplay();
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            const display = document.getElementById("timer-display");
+            display.innerText = formatted;
+
+            if (timeLeft <= 30) {
+                display.classList.add("text-rose-600", "animate-pulse");
+                display.classList.remove("text-slate-800");
+            } else {
+                display.classList.remove("text-rose-600", "animate-pulse");
+                display.classList.add("text-slate-800");
+            }
+        }
+
+        function handleTimeOut() {
+            const q = currentQuestions[currentQuestionIndex];
+            userAnswers.push({
+                question: q,
+                selected: -1,
+                isCorrect: false,
+                isTimeout: true
+            });
+
+            disableOptions();
+            showFeedback(false, "Tempo esgotado! Você não respondeu no prazo.");
+        }
+
+        function selectOption(index) {
+            clearInterval(timer);
+            const q = currentQuestions[currentQuestionIndex];
+            const isCorrect = (index === q.correct);
+
+            if (isCorrect) score++;
+
+            userAnswers.push({
+                question: q,
+                selected: index,
+                isCorrect: isCorrect,
+                isTimeout: false
+            });
+
+            updateHeaderStats();
+            disableOptions();
+            highlightAnswers(index, q.correct);
+
+            showFeedback(isCorrect);
+        }
+
+        function disableOptions() {
+            const container = document.getElementById("options-container");
+            const buttons = container.getElementsByTagName("button");
+            for (let btn of buttons) {
+                btn.disabled = true;
+                btn.classList.remove("hover:border-indigo-500", "hover:bg-indigo-50/40");
+                btn.classList.add("cursor-not-allowed");
+            }
+        }
+
+        function highlightAnswers(selectedIdx, correctIdx) {
+            // Destacar Resposta Correta
+            const correctBtn = document.getElementById(`opt-${correctIdx}`);
+            if (correctBtn) {
+                correctBtn.classList.remove("border-slate-200/90");
+                correctBtn.classList.add("bg-emerald-50/90", "border-emerald-500", "text-emerald-950", "ring-1", "ring-emerald-400");
+                correctBtn.querySelector("span").classList.add("bg-emerald-600", "text-white", "border-emerald-600");
+            }
+
+            // Destacar Incorreta Selecionada
+            if (selectedIdx !== correctIdx && selectedIdx !== -1) {
+                const wrongBtn = document.getElementById(`opt-${selectedIdx}`);
+                if (wrongBtn) {
+                    wrongBtn.classList.remove("border-slate-200/90");
+                    wrongBtn.classList.add("bg-rose-50/90", "border-rose-400", "text-rose-950", "ring-1", "ring-rose-300");
+                    wrongBtn.querySelector("span").classList.add("bg-rose-600", "text-white", "border-rose-600");
+                }
+            }
+        }
+
+        function showFeedback(isCorrect, customMessage = null) {
+            const feedbackPanel = document.getElementById("feedback-panel");
+            const feedbackMessage = document.getElementById("feedback-message");
+            const nextBtn = document.getElementById("next-btn");
+
+            feedbackPanel.classList.remove("hidden");
+
+            if (customMessage) {
+                feedbackMessage.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-sm">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-amber-700">Atenção</h4>
+                        <p class="text-xs text-slate-600 font-medium">${customMessage}</p>
+                    </div>
+                `;
+            } else if (isCorrect) {
+                feedbackMessage.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-700">Resposta Correta!</h4>
+                        <p class="text-xs text-slate-600 font-medium">Parabéns, você acertou a questão.</p>
+                    </div>
+                `;
+            } else {
+                feedbackMessage.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-sm">
+                        <i class="fa-solid fa-xmark"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-rose-700">Resposta Incorreta!</h4>
+                        <p class="text-xs text-slate-600 font-medium">Veja a resolução detalhada ao final da rodada.</p>
+                    </div>
+                `;
+            }
+
+            if (currentQuestionIndex === currentQuestions.length - 1) {
+                nextBtn.innerHTML = `Ver Diagnóstico Final <i class="fa-solid fa-chart-line"></i>`;
+            } else {
+                nextBtn.innerHTML = `Próxima Questão <i class="fa-solid fa-arrow-right"></i>`;
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuestions.length) {
+                loadQuestion();
+            } else {
+                finishGame();
+            }
+        }
+
+        function updateHeaderStats() {
+            document.getElementById("current-score").innerText = score;
+        }
+
+        // --- SISTEMA DE REINÍCIO & VOLTAR AO INÍCIO TOTAL ---
+
+        function confirmRestart() {
+            document.getElementById("restart-modal").classList.remove("hidden");
+        }
+
+        function closeRestartModal() {
+            document.getElementById("restart-modal").classList.add("hidden");
+        }
+
+        function confirmRestartAction() {
+            closeRestartModal();
+            clearInterval(timer);
+            startGame();
+        }
+
+        function resetToInitialState() {
+            clearInterval(timer);
+            // Limpar nome e estado
+            document.getElementById("candidate-name").value = "";
+            candidateName = "Candidato";
+            
+            // Voltar para a tela inicial total
+            document.getElementById("results-screen").classList.add("hidden");
+            document.getElementById("game-screen").classList.add("hidden");
+            document.getElementById("header-right").classList.add("hidden");
+            document.getElementById("start-screen").classList.remove("hidden");
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- EXPORTAÇÃO EM PDF ---
+
+        function exportToPDF() {
+            const element = document.getElementById("results-screen");
+            
+            // Configurações do html2pdf
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     `Simulado_FAPEC_RL_${candidateName.replace(/\s+/g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            const pdfBtn = event.currentTarget;
+            const originalText = pdfBtn.innerHTML;
+            pdfBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Gerando PDF...`;
+            pdfBtn.disabled = true;
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                pdfBtn.innerHTML = originalText;
+                pdfBtn.disabled = false;
+            }).catch(err => {
+                console.error("Erro ao gerar PDF:", err);
+                pdfBtn.innerHTML = originalText;
+                pdfBtn.disabled = false;
+            });
+        }
+
+        // --- ANÁLISE DE DÉFICITS & RESULTADOS ---
+
+        function finishGame() {
+            clearInterval(timer);
+            document.getElementById("game-screen").classList.add("hidden");
+            document.getElementById("results-screen").classList.remove("hidden");
+
+            const total = currentQuestions.length;
+            const percent = Math.round((score / total) * 100);
+
+            document.getElementById("res-candidate-name").innerText = candidateName;
+            document.getElementById("final-score").innerText = `${score}/${total}`;
+            document.getElementById("final-percent").innerText = `${percent}%`;
+            document.getElementById("final-correct").innerText = score;
+            document.getElementById("final-wrong").innerText = total - score;
+
+            // Gerar Diagnóstico por Assunto
+            generateDiagnostic();
+
+            // Renderizar Gabarito Comentado
+            renderReviewList();
+        }
+
+        function generateDiagnostic() {
+            const topicStats = {};
+
+            userAnswers.forEach(ans => {
+                const topic = ans.question.topic;
+                if (!topicStats[topic]) {
+                    topicStats[topic] = { total: 0, correct: 0 };
+                }
+                topicStats[topic].total++;
+                if (ans.isCorrect) {
+                    topicStats[topic].correct++;
+                }
+            });
+
+            const labels = [];
+            const dataPercentages = [];
+            const deficits = [];
+
+            Object.keys(topicStats).forEach(topic => {
+                const stat = topicStats[topic];
+                const acc = Math.round((stat.correct / stat.total) * 100);
+                labels.push(topic);
+                dataPercentages.push(acc);
+
+                deficits.push({
+                    topic: topic,
+                    accuracy: acc,
+                    correct: stat.correct,
+                    total: stat.total
+                });
+            });
+
+            // Renderizar Gráfico
+            renderChart(labels, dataPercentages);
+
+            // Renderizar Lista Visual de Déficits
+            const deficitsContainer = document.getElementById("deficits-list");
+            deficitsContainer.innerHTML = "";
+
+            deficits.forEach(d => {
+                const div = document.createElement("div");
+                const isWeak = d.accuracy < 70;
+                
+                div.className = `p-3 rounded-xl border flex items-center justify-between text-xs ${
+                    isWeak 
+                    ? 'bg-rose-50/70 border-rose-200 text-rose-900' 
+                    : 'bg-emerald-50/70 border-emerald-200 text-emerald-900'
+                }`;
+
+                div.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid ${isWeak ? 'fa-triangle-exclamation text-rose-600' : 'fa-circle-check text-emerald-600'} text-sm"></i>
+                        <div>
+                            <p class="font-bold">${d.topic}</p>
+                            <p class="text-[11px] opacity-80">Acertos: ${d.correct} de ${d.total} questão(ões)</p>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-md text-[11px] font-bold ${
+                        isWeak ? 'bg-rose-200/80 text-rose-900' : 'bg-emerald-200/80 text-emerald-900'
+                    }">
+                        ${d.accuracy}% ${isWeak ? '(Revisar)' : '(Bom)'}
+                    </span>
+                `;
+                deficitsContainer.appendChild(div);
+            });
+        }
+
+        function renderChart(labels, data) {
+            const ctx = document.getElementById('topicsChart').getContext('2d');
+            
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '% de Acerto por Conteúdo',
+                        data: data,
+                        backgroundColor: 'rgba(79, 70, 229, 0.15)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(79, 70, 229, 1)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#cbd5e1' },
+                            grid: { color: '#e2e8f0' },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function renderReviewList() {
+            const reviewContainer = document.getElementById("review-list");
+            reviewContainer.innerHTML = "";
+
+            const optionLetters = ["A", "B", "C", "D", "E"];
+
+            userAnswers.forEach((ans, idx) => {
+                const q = ans.question;
+                const card = document.createElement("div");
+                card.className = `p-4 sm:p-5 rounded-xl border ${ans.isCorrect ? 'border-emerald-200 bg-emerald-50/20' : 'border-rose-200 bg-rose-50/20'}`;
+
+                let statusBadge = ans.isCorrect 
+                    ? `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold px-2.5 py-0.5 rounded-md"><i class="fa-solid fa-check mr-1"></i>Correta</span>`
+                    : (ans.isTimeout 
+                        ? `<span class="bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold px-2.5 py-0.5 rounded-md"><i class="fa-solid fa-clock mr-1"></i>Tempo Esgotado</span>`
+                        : `<span class="bg-rose-100 text-rose-800 border border-rose-300 text-xs font-bold px-2.5 py-0.5 rounded-md"><i class="fa-solid fa-xmark mr-1"></i>Incorreta</span>`);
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start gap-2 mb-2">
+                        <span class="text-xs font-bold text-slate-500">QUESTÃO ${idx + 1} • <span class="text-indigo-700">${q.topic}</span></span>
+                        ${statusBadge}
+                    </div>
+                    <p class="text-slate-900 text-sm font-semibold mb-3 leading-relaxed">${q.question}</p>
+                    
+                    <div class="text-xs space-y-1.5 mb-3 bg-white/70 p-3 rounded-lg border border-slate-200/60">
+                        <p class="text-slate-700">Sua resposta: <strong class="${ans.isCorrect ? 'text-emerald-700' : 'text-rose-700'}">${ans.selected >= 0 ? optionLetters[ans.selected] + ') ' + q.options[ans.selected] : 'Sem resposta (Tempo Esgotado)'}</strong></p>
+                        ${!ans.isCorrect ? `<p class="text-slate-700">Gabarito correto: <strong class="text-emerald-700">${optionLetters[q.correct]}) ${q.options[q.correct]}</strong></p>` : ''}
+                    </div>
+
+                    <div class="bg-white p-3.5 rounded-lg border border-slate-200 text-xs text-slate-700">
+                        <span class="font-bold text-indigo-700 block mb-1"><i class="fa-solid fa-lightbulb mr-1"></i> Resolução Comentada:</span>
+                        ${q.explanation}
+                    </div>
+                `;
+                reviewContainer.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
